@@ -49,7 +49,8 @@ void TickFct()
 			}
 			break;
 		default:
-			state = START;
+			state = SM1_START;
+			break;
 	}
 	switch(state){
 		case SM1_START:
