@@ -1,7 +1,7 @@
 /*	Author: acard079
  *  Partner(s) Name: 
  *	Lab Section: 21
- *	Assignment: Lab #4  Exercise #1
+ *	Assignment: Lab #4  Exercise #2
  *	Exercise Description: [optional - include for your own benefit]
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -12,60 +12,81 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {SM1_START, SM1_PB0, SM1_PB0RELEASE, SM1_PB1, SM1_PB1RELEASE} state;
+enum states {START, INCREMENT, HOLD, DECREMENT, RESET, WAIT} state;
 
 void TickFct()
 {
 	switch(state) {
-		case SM1_START:
-			state = SM1_PB0;
+		case START:
+			state = WAIT;
+			PORTC = 0x07;
 			break;
-		case SM1_PB0:
-			if(PINA & 0x01){
-				state = SM1_PB0;
+		case WAIT:
+			if(PINA == 0x01){
+				state = INCREMENT;
+			}else if(PINA == 0x02){
+				state = DECREMENT;
+			}else if(PINA == 0x03){
+				state = RESET;
 			}else{
-				state = SM1_PB0RELEASE;
+				state = HOLD;
 			}
 			break;
-		case SM1_PB0RELEASE:
-			if(PINA & 0x01){
-				state = SM1_PB1;
+		case INCREMENT:
+			state = HOLD;
+			break;
+		case DECREMENT:
+			state = HOLD;
+			break;
+		case HOLD:
+			if(PINA == 0x03){
+				state = RESET;
+			}else if(PINA == 0x00){
+				state = WAIT;
 			}else{
-				state = SM1_PB0RELEASE;
+				state = HOLD;
 			}
 			break;
-		case SM1_PB1:
-			if(PINA & 0x01){
-				state = SM1_PB1;
+			
+		case RESET:
+			if(PINA == 0x03){
+				state = RESET;
 			}else{
-				state = SM1_PB1RELEASE;
-			}
-			break;
-		case SM1_PB1RELEASE:
-			if(PINA & 0x01){
-				state = SM1_PB0;
-			}else{
-				state = SM1_PB1RELEASE;
+				state = HOLD;
 			}
 			break;
 		default:
 			state = START;
+			break;
 	}
 	switch(state){
-		case SM1_START:
-			PORTB = 0x01;
+		case START:
+			PORTC = 0x07;
 			break;
-		case SM1_PB0:
-			PORTB = 0x01;
+		case INCREMENT:
+			if(PORTC < 0x09){
+				PORTC = PORTC + 0x01;
+			}else{
+				PORTC = 0x09;
+			}
 			break;
-		case SM1_PB0RELEASE:
-			PORTB = 0x01;
+		
+		case DECREMENT:
+			if(PORTC > 0){
+				PORTC = PORTC - 0x01;
+			}else{
+				PORTC = 0x00;
+			}
 			break;
-		case SM1_PB1:
-			PORTB = 0x02;
+		case HOLD:
 			break;
-		case SM1_PB1RELEASE:
-			PORTB = 0x02;
+		case WAIT:
+			PORTC = 0x07;
+		case RESET:
+			PORTC = 0x00;
+			break;
+		default:
+			PORTC = 0x07;
 			break;
 	}
 }
@@ -73,13 +94,11 @@ void TickFct()
 int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00; PORTA = 0xFF; // PORTA is input
-	DDRB = 0xFF; PORTB = 0x00; //PORTB is output
+	DDRC = 0xFF; PORTC = 0x00; //PORTB is output
 
     /* Insert your solution below */
     while (1) {
 	    TickFct();
-
-
     }
     return 1;
 }

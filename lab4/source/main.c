@@ -12,7 +12,7 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, INCREMENT, DECREMENT, RESET, WAIT} state;
+enum states {START, INCREMENT, HOLD, DECREMENT, RESET, WAIT} state;
 
 void TickFct()
 {
@@ -24,25 +24,39 @@ void TickFct()
 		case WAIT:
 			if(PINA == 0x01){
 				state = INCREMENT;
-			}else if (PINA == 0x02){
+			}else if(PINA == 0x02){
 				state = DECREMENT;
 			}else if(PINA == 0x03){
 				state = RESET;
 			}else{
-				state = WAIT;
+				state = HOLD;
 			}
 			break;
 		case INCREMENT:
-			state = WAIT;
+			state = HOLD;
 			break;
 		case DECREMENT:
-			state = WAIT;
+			state = HOLD;
 			break;
+		case HOLD:
+			if(PINA == 0x03){
+				state = RESET;
+			}else if(PINA == 0x00){
+				state = WAIT;
+			}else{
+				state = HOLD;
+			}
+			break;
+			
 		case RESET:
-			state = WAIT;
+			if(PINA == 0x03){
+				state = RESET;
+			}else{
+				state = HOLD;
+			}
 			break;
 		default:
-			state = WAIT;
+			state = START;
 			break;
 	}
 	switch(state){
@@ -56,6 +70,7 @@ void TickFct()
 				PORTC = 0x09;
 			}
 			break;
+		
 		case DECREMENT:
 			if(PORTC > 0){
 				PORTC = PORTC - 0x01;
@@ -63,10 +78,16 @@ void TickFct()
 				PORTC = 0x00;
 			}
 			break;
-		case WAIT:
+		case HOLD:
 			break;
+		case WAIT:
+			PORTC = 0x07;
 		case RESET:
 			PORTC = 0x00;
+			break;
+		default:
+			PORTC = 0x07;
+			break;
 	}
 }
 
@@ -78,8 +99,6 @@ int main(void) {
     /* Insert your solution below */
     while (1) {
 	    TickFct();
-
-
     }
     return 1;
 }
