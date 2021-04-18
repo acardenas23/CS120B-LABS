@@ -16,14 +16,14 @@ enum states {START, INCREMENT, HOLD, DECREMENT, RESET, WAIT} state;
 
 void TickFct()
 {
-	switch(state) {
+	switch(state){
 		case START:
 			state = WAIT;
 			PORTC = 0x07;
 			break;
 		case WAIT:
 			if(PINA == 0x01){
-				state = INCREMENT;
+				state =INCREMENT;
 			}else if(PINA == 0x02){
 				state = DECREMENT;
 			}else if(PINA == 0x03){
@@ -47,7 +47,6 @@ void TickFct()
 				state = HOLD;
 			}
 			break;
-			
 		case RESET:
 			if(PINA == 0x03){
 				state = RESET;
@@ -56,12 +55,16 @@ void TickFct()
 			}
 			break;
 		default:
-			state = START;
+			state = WAIT;
 			break;
 	}
 	switch(state){
 		case START:
 			PORTC = 0x07;
+			break;
+		case WAIT:
+			break;
+		case HOLD:
 			break;
 		case INCREMENT:
 			if(PORTC < 0x09){
@@ -70,7 +73,6 @@ void TickFct()
 				PORTC = 0x09;
 			}
 			break;
-		
 		case DECREMENT:
 			if(PORTC > 0){
 				PORTC = PORTC - 0x01;
@@ -78,10 +80,6 @@ void TickFct()
 				PORTC = 0x00;
 			}
 			break;
-		case HOLD:
-			break;
-		case WAIT:
-			PORTC = 0x07;
 		case RESET:
 			PORTC = 0x00;
 			break;
