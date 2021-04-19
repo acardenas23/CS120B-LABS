@@ -12,47 +12,53 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, INCREMENT, HOLD, DECREMENT, RESET, WAIT} state;
+enum states {START, WAIT, WAIT2, HOLDINC, HOLDDEC, INC, DEC, RESET} state;
+
 
 void TickFct()
 {
-	switch(state) {
+	switch(state){
 		case START:
 			state = WAIT;
-			PORTC = 0x07;
 			break;
 		case WAIT:
-			if(PINA == 0x01){
-				state = INCREMENT;
-			}else if(PINA == 0x02){
-				state = DECREMENT;
-			}else if(PINA == 0x03){
+			state = WAIT2;
+			break;
+		case WAIT2:
+			if((PINA & 0x01) == 0x01){
+				state = INC;
+			}else if((PINA & 0x02) == 0x02){
+				state = DEC;
+			}else if((PINA & 0x03) == 0x03){
 				state = RESET;
-			}else{
-				state = HOLD;
 			}
 			break;
-		case INCREMENT:
-			state = HOLD;
-			break;
-		case DECREMENT:
-			state = HOLD;
-			break;
-		case HOLD:
-			if(PINA == 0x03){
-				state = RESET;
-			}else if(PINA == 0x00){
-				state = WAIT;
+		case HOLDINC:
+			if(((PINA & 0x01) == 0x01)||(PINA == 0x00)){
+				state = HOLDINC;
 			}else{
-				state = HOLD;
+				state = WAIT2;
+			}
+			break;
+		case HOLDDEC:
+			if(((PINA & 0x02) ==0x02 )|| (PINA == 0x00)){
+				state = HOLDDEC;
+			}else{
+				state = WAIT2;
 			}
 			break;
 			
+		case INC:
+			state = HOLDINC;
+			break;
+		case DEC:
+			state = HOLDDEC;
+			break;
 		case RESET:
-			if(PINA == 0x03){
+			if((PINA & 0x03) == 0x03){
 				state = RESET;
 			}else{
-				state = HOLD;
+				state = WAIT2;
 			}
 			break;
 		default:
@@ -63,25 +69,30 @@ void TickFct()
 		case START:
 			PORTC = 0x07;
 			break;
-		case INCREMENT:
+		case WAIT:
+			PORTC = 0x07;
+			break;
+		case WAIT2:
+			break;
+		case HOLDINC:
+			break;
+		case HOLDDEC:
+			break;
+		
+		case INC:
 			if(PORTC < 0x09){
 				PORTC = PORTC + 0x01;
 			}else{
 				PORTC = 0x09;
 			}
 			break;
-		
-		case DECREMENT:
-			if(PORTC > 0){
+		case DEC:
+			if(PORTC > 0x00){
 				PORTC = PORTC - 0x01;
 			}else{
 				PORTC = 0x00;
 			}
 			break;
-		case HOLD:
-			break;
-		case WAIT:
-			PORTC = 0x07;
 		case RESET:
 			PORTC = 0x00;
 			break;
@@ -95,7 +106,7 @@ int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00; PORTA = 0xFF; // PORTA is input
 	DDRC = 0xFF; PORTC = 0x00; //PORTB is output
-
+	state = START;
     /* Insert your solution below */
     while (1) {
 	    TickFct();

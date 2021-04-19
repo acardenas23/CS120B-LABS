@@ -12,7 +12,8 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, WAIT, WAIT2, INC, DEC, HOLD, RESET} state;
+enum states {START, WAIT, WAIT2, HOLDINC, HOLDDEC, INC, DEC, RESET} state;
+
 
 void TickFct()
 {
@@ -21,15 +22,7 @@ void TickFct()
 			state = WAIT;
 			break;
 		case WAIT:
-			if((PINA & 0x01) == 0x01){
-				state = INC;
-			}else if((PINA & 0x02) == 0x02){
-				state = DEC;
-			}else if((PINA & 0x03) == 0x03){
-				state = RESET;
-			}else{
-				state = HOLD;
-			}
+			state = WAIT2;
 			break;
 		case WAIT2:
 			if((PINA & 0x01) == 0x01){
@@ -38,30 +31,34 @@ void TickFct()
 				state = DEC;
 			}else if((PINA & 0x03) == 0x03){
 				state = RESET;
-			}else{
-				state = HOLD;
 			}
 			break;
+		case HOLDINC:
+			if(((PINA & 0x01) == 0x01)||(PINA == 0x00)){
+				state = HOLDINC;
+			}else{
+				state = WAIT2;
+			}
+			break;
+		case HOLDDEC:
+			if(((PINA & 0x02) ==0x02 )|| (PINA == 0x00)){
+				state = HOLDDEC;
+			}else{
+				state = WAIT2;
+			}
+			break;
+			
 		case INC:
-				state = HOLD;
+			state = HOLDINC;
 			break;
 		case DEC:
-				state = HOLD;
-			break;
-		case HOLD:
-			if((PINA & 0x03) == 0x03){
-				state = RESET;
-			}else if(PINA == 0x00){
-				state = WAIT2;
-			}else{
-				state = HOLD;
-			}
+			state = HOLDDEC;
 			break;
 		case RESET:
 			if((PINA & 0x03) == 0x03){
 				state = RESET;
 			}else{
-				state = HOLD;
+				state = WAIT2;
 			}
 			break;
 		default:
@@ -77,8 +74,11 @@ void TickFct()
 			break;
 		case WAIT2:
 			break;
-		case HOLD:
+		case HOLDINC:
 			break;
+		case HOLDDEC:
+			break;
+		
 		case INC:
 			if(PORTC < 0x09){
 				PORTC = PORTC + 0x01;
