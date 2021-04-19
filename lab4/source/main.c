@@ -12,50 +12,60 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, INCREMENT, HOLD, DECREMENT, RESET, WAIT} state;
+enum states {START, WAIT, WAIT2, INC, DEC, HOLD, RESET} state;
 
 void TickFct()
 {
 	switch(state){
 		case START:
 			state = WAIT;
-			PORTC = 0x07;
 			break;
 		case WAIT:
-			if(PINA == 0x01){
-				state =INCREMENT;
-			}else if(PINA == 0x02){
-				state = DECREMENT;
-			}else if(PINA == 0x03){
+			if((PINA & 0x01) == 0x01){
+				state = INC;
+			}else if((PINA & 0x02) == 0x02){
+				state = DEC;
+			}else if((PINA & 0x03) == 0x03){
 				state = RESET;
 			}else{
 				state = HOLD;
 			}
 			break;
-		case INCREMENT:
-			state = HOLD;
+		case WAIT2:
+			if((PINA & 0x01) == 0x01){
+				state = INC;
+			}else if((PINA & 0x02) == 0x02){
+				state = DEC;
+			}else if((PINA & 0x03) == 0x03){
+				state = RESET;
+			}else{
+				state = HOLD;
+			}
 			break;
-		case DECREMENT:
-			state = HOLD;
+		case INC:
+				state = HOLD;
+			break;
+		case DEC:
+				state = HOLD;
 			break;
 		case HOLD:
-			if(PINA == 0x03){
+			if((PINA & 0x03) == 0x03){
 				state = RESET;
 			}else if(PINA == 0x00){
-				state = WAIT;
+				state = WAIT2;
 			}else{
 				state = HOLD;
 			}
 			break;
 		case RESET:
-			if(PINA == 0x03){
+			if((PINA & 0x03) == 0x03){
 				state = RESET;
 			}else{
 				state = HOLD;
 			}
 			break;
 		default:
-			state = WAIT;
+			state = START;
 			break;
 	}
 	switch(state){
@@ -63,18 +73,21 @@ void TickFct()
 			PORTC = 0x07;
 			break;
 		case WAIT:
+			PORTC = 0x07;
+			break;
+		case WAIT2:
 			break;
 		case HOLD:
 			break;
-		case INCREMENT:
+		case INC:
 			if(PORTC < 0x09){
 				PORTC = PORTC + 0x01;
 			}else{
 				PORTC = 0x09;
 			}
 			break;
-		case DECREMENT:
-			if(PORTC > 0){
+		case DEC:
+			if(PORTC > 0x00){
 				PORTC = PORTC - 0x01;
 			}else{
 				PORTC = 0x00;
@@ -93,7 +106,7 @@ int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00; PORTA = 0xFF; // PORTA is input
 	DDRC = 0xFF; PORTC = 0x00; //PORTB is output
-
+	state = START;
     /* Insert your solution below */
     while (1) {
 	    TickFct();
