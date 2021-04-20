@@ -25,24 +25,30 @@ void TickFct()
 			state = WAIT2;
 			break;
 		case WAIT2:
-			if((PINA & 0x01) == 0x01){
+			if(PINA == 0x01){
 				state = INC;
-			}else if((PINA & 0x02) == 0x02){
+			}else if(PINA == 0x02){
 				state = DEC;
-			}else if((PINA & 0x03) == 0x03){
+			}else if(PINA == 0x03){
 				state = RESET;
+			}else if(PINA == 0x00){
+				state =  WAIT2;
 			}
 			break;
 		case HOLDINC:
-			if(((PINA & 0x01) == 0x01)||(PINA == 0x00)){
+			if(PINA == 0x01){
 				state = HOLDINC;
+			}else if(PINA == 0x03){
+				state = RESET;
 			}else{
 				state = WAIT2;
 			}
 			break;
 		case HOLDDEC:
-			if(((PINA & 0x02) ==0x02 )|| (PINA == 0x00)){
+			if(PINA == 0x02){
 				state = HOLDDEC;
+			}else if(PINA == 0x03){
+				state = RESET;
 			}else{
 				state = WAIT2;
 			}
@@ -55,7 +61,7 @@ void TickFct()
 			state = HOLDDEC;
 			break;
 		case RESET:
-			if((PINA & 0x03) == 0x03){
+			if(PINA == 0x03){
 				state = RESET;
 			}else{
 				state = WAIT2;
