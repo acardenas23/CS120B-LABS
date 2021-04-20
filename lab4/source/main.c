@@ -1,7 +1,7 @@
 /*	Author: acard079
  *  Partner(s) Name: 
  *	Lab Section: 21
- *	Assignment: Lab #4  Exercise #2
+ *	Assignment: Lab #4  Exercise #3
  *	Exercise Description: [optional - include for your own benefit]
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -12,110 +12,82 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, WAIT, WAIT2, HOLDINC, HOLDDEC, INC, DEC, RESET} state;
+enum states {START, INIT, UNLOCKEDPOUND, UNLOCKED, HOLD, LOCKED} state;
 
 
 void TickFct()
 {
 	switch(state){
 		case START:
-			state = WAIT;
+			state = INIT;
 			break;
-		case WAIT:
-			state = WAIT2;
-			break;
-		case WAIT2:
-			if(PINA == 0x01){
-				state = INC;
-			}else if(PINA == 0x02){
-				state = DEC;
-			}else if(PINA == 0x03){
-				state = RESET;
-			}else if(PINA == 0x00){
-				state =  WAIT2;
-			}
-			break;
-		case HOLDINC:
-			if(PINA == 0x01){
-				state = HOLDINC;
-			}else if(PINA == 0x03){
-				state = RESET;
-			}else if(PINA == 0x02){
-				state = DEC;
+		case INIT:
+			if(PINA == 0x04){
+				state = UNLOCKEDPOUND;
+			}else if(PINA == 0x80){
+				state = LOCKED;
 			}else{
-				state = WAIT2;
+				state = INIT;
 			}
 			break;
-		case HOLDDEC:
+		case UNLOCKEDPOUND:
+			if(PINA == 0x04){
+				state = UNLOCKEDPOUND;
+			}else if(PINA == 0x02){
+				state = UNLOCKED;
+			}else{
+				state = LOCKED;
+			}
+			break;
+		case UNLOCKED:
 			if(PINA == 0x02){
-				state = HOLDDEC;
-			}else if(PINA == 0x03){
-				state = RESET;
-			}else if(PINA == 0x01){
-				state = INC;
+				state = HOLD;
 			}else{
-				state = WAIT2;
+				state = INIT;
 			}
 			break;
-			
-		case INC:
-			state = HOLDINC;
-			break;
-		case DEC:
-			state = HOLDDEC;
-			break;
-		case RESET:
-			if(PINA == 0x03){
-				state = RESET;
+		case HOLD:
+			if(PINA == 0x02){
+				state = HOLD;
 			}else{
-				state = WAIT2;
+				state = INIT;
 			}
 			break;
+		case LOCKED:
+			if(PINA == 0x80){
+				state = LOCKED;
+			}else{
+				state = INIT;
+			}
 		default:
 			state = START;
 			break;
 	}
 	switch(state){
 		case START:
-			PORTC = 0x07;
+			PORTB = 0x00;
 			break;
-		case WAIT:
-			PORTC = 0x07;
+		case INIT:
 			break;
-		case WAIT2:
+		case UNLOCKEDPOUND:
 			break;
-		case HOLDINC:
+		case UNLOCKED:
 			break;
-		case HOLDDEC:
+		case HOLD:
+			PORTB = 0x01;
 			break;
-		
-		case INC:
-			if(PORTC < 0x09){
-				PORTC = PORTC + 0x01;
-			}else{
-				PORTC = 0x09;
-			}
-			break;
-		case DEC:
-			if(PORTC > 0x00){
-				PORTC = PORTC - 0x01;
-			}else{
-				PORTC = 0x00;
-			}
-			break;
-		case RESET:
-			PORTC = 0x00;
+		case LOCKED:
+			PORTB = 0x00;
 			break;
 		default:
-			PORTC = 0x07;
-			break;
+			PORTB = 0x00;
 	}
 }
 
 int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00; PORTA = 0xFF; // PORTA is input
-	DDRC = 0xFF; PORTC = 0x00; //PORTB is output
+	DDRB = 0xFF; PORTB = 0x00; //PORTB is output
 	state = START;
     /* Insert your solution below */
     while (1) {

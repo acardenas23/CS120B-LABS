@@ -15,52 +15,29 @@
 # that they are not ran in isolation but in the order shown and the state of the device is not reset or 
 # altered in between executions (unless preconditions are used).
 tests = [
-{'description': 'PINA: 0x02 => PORTC: 0x07',
-    'steps': [ {'inputs': [('PINA',0x00)], 'iterations': 2},
-        {'inputs': [('PINA', 0x01)], 'iterations': 2},
-        {'inputs': [('PINA', 0x01)], 'iterations': 2},
-        {'inputs': [('PINA', 0x00)], 'iterations': 2},
-        {'inputs': [('PINA', 0x02)], 'iterations': 2}
+{'description': 'PINA: 0x00 => PORTB: 0x00',
+    'steps': [ {'inputs': [('PINA',0x00)], 'iterations': 2}
         ],
-    'expected': [('PORTC',0x07)],
+    'expected': [('PORTB',0x00)],
     },
-{'description': 'PINA: 0x01 => PORTC: 0x09',
-    'steps': [ {'inputs': [('PINA',0x00)], 'iterations': 2},
-        {'inputs': [('PINA', 0x01)], 'iterations': 2},
-        {'inputs': [('PINA', 0x01)], 'iterations': 2},
-        {'inputs': [('PINA', 0x00)], 'iterations': 2},
-        {'inputs': [('PINA', 0x02)], 'iterations': 2},
-        {'inputs': [('PINA', 0x00)], 'iterations': 2},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5},
-        {'inputs': [('PINA', 0x00)], 'iterations': 5},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5}
-        ],
-    'expected': [('PORTC',0x09)],
+{'description': 'PINA: 0x04, 0x02 => PORTB: 0x01',
+    'steps': [ {'inputs': [('PINA',0x04)], 'iterations': 2},
+        {'inputs': [('PINA', 0x02)], 'iterations': 5}
+       ],
+    'expected': [('PORTB',0x01)],
     },
-{'description': 'count up to 2, down to 1 => PORTC: 0x01',
-    'steps': [ {'inputs': [('PINA',0x00)], 'iterations': 2},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5},
-        {'inputs': [('PINA', 0x00)], 'iterations': 5},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5},
+{'description': 'PINA = 0x80 =>PORTB = 0x00',
+    'steps': [ {'inputs': [('PINA',0x04)], 'iterations': 5},
         {'inputs': [('PINA', 0x02)], 'iterations': 5},
-        {'inputs': [('PINA', 0x03)], 'iterations': 5},
-        {'inputs': [('PINA', 0x00)], 'iterations': 5},
-        {'inputs': [('PINA', 0x02)], 'iterations': 5},
-        {'inputs': [('PINA', 0x00)], 'iterations': 5},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5},
-        {'inputs': [('PINA', 0x00)], 'iterations': 5},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5},
-        {'inputs': [('PINA', 0x02)], 'iterations': 5},
-        {'inputs': [('PINA', 0x01)], 'iterations': 5}
-
+        {'inputs': [('PINA', 0x80)], 'iterations': 5}
         ],
-    'expected': [('PORTC',0x02)],
+    'expected': [('PORTC',0x00)],
     },
 
 
 
     ]
-watch = ['state', 'PORTC', 'PINA']
+watch = ['state', 'PORTB', 'PINA']
 
 # Optionally you can add a set of "watch" variables these need to be global or static and may need
 # to be scoped at the function level (for static variables) if there are naming conflicts. The 
