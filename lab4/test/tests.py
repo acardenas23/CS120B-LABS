@@ -27,13 +27,18 @@ tests = [
        ],
     'expected': [('PORTB',0x01)],
     },
-{'description': 'PINA =  =>PORTB = 0x01',
+{'description': 'PINA =  =>PORTB = 0x00',
     'steps': [ {'inputs': [('PINA',0x04)], 'iterations': 5},
+        {'inputs': [('PINA', 0x00)], 'iterations': 5},
+        {'inputs': [('PINA', 0x02)], 'iterations': 5},
+        {'inputs': [('PINA', 0x00)], 'iterations': 5},
+        {'inputs': [('PINA', 0x04)], 'iterations': 5},
         {'inputs': [('PINA', 0x00)], 'iterations': 5},
         {'inputs': [('PINA', 0x02)], 'iterations': 5}
         
+
         ],
-    'expected': [('PORTB',0x01)],
+    'expected': [('PORTB',0x02)],
     },
 {'description': 'PINA = 0x06 =>PORTB = 0x00',
     'steps': [ {'inputs': [('PINA',0x04)], 'iterations': 5},

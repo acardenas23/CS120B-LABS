@@ -12,7 +12,7 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, INIT, UNLOCKEDPOUND, HOLDPOUND, UNLOCKED, HOLDY, LOCKED} state;
+enum states {START, INIT, UNLOCKEDPOUND2, UNLOCKEDPOUND, HOLDCODE2, HOLDPOUND2, HOLDPOUND, UNLOCKED, HOLDY, LOCKED} state;
 
 
 void TickFct()
@@ -52,10 +52,26 @@ void TickFct()
 			if(PINA == 0x02){
 				state = HOLDY;
 			}else if(PINA == 0x00){
-				state = UNLOCKED;
+				state = HOLDCODE2;
 				//no button is pressed
 			}else{
 				state = INIT;
+			}
+			break;
+		case HOLDCODE2:
+			if(PINA == 0x04){
+				state = UNLOCKEDPOUND2;
+			}else{
+				state = INIT;
+			}
+			break;
+		case UNLOCKEDPOUND2:
+			if(PINA == 0x00){
+				state = HOLDPOUND2;
+			}else if(PINA == 0x02){
+				state = LOCKED;
+			}else{
+				state = UNLOCKED;
 			}
 			break;
 		case HOLDY:
@@ -89,7 +105,7 @@ void TickFct()
 		case HOLDPOUND:
 			break;
 		case UNLOCKED:
-			PORTB = 0x00;
+			PORTB = 0x01;
 			break;
 		case HOLDY:
 			PORTB = 0x00;
@@ -97,6 +113,14 @@ void TickFct()
 		case LOCKED:
 			PORTB = 0x00;
 			break;
+		case UNLOCKEDPOUND2:
+			break;
+		case HOLDPOUND2:
+			break;
+		case HOLDCODE2:
+			break;
+
+
 		default:
 			PORTB = 0x00;
 	}
