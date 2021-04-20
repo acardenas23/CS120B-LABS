@@ -1,7 +1,7 @@
 /*	Author: acard079
  *  Partner(s) Name: 
  *	Lab Section: 21
- *	Assignment: Lab #4  Exercise #3
+ *	Assignment: Lab #4  Exercise #4
  *	Exercise Description: [optional - include for your own benefit]
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -89,9 +89,10 @@ void TickFct()
 		case HOLDPOUND:
 			break;
 		case UNLOCKED:
+			PORTB = 0x00;
 			break;
 		case HOLDY:
-			PORTB = 0x01;
+			PORTB = 0x00;
 			break;
 		case LOCKED:
 			PORTB = 0x00;
