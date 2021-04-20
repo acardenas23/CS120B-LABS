@@ -33,7 +33,7 @@ void TickFct()
 		case UNLOCKEDPOUND:
 			if(PINA == 0x04){
 				state = UNLOCKEDPOUND;
-			}else if((PINA & 0x80) == 0x80){
+			}else if(((PINA & 0x80) == 0x80)||((PINA & 0x06) == 0x06)){
 				state = LOCKED;
 			}else{
 				state = UNLOCKED;
@@ -42,6 +42,9 @@ void TickFct()
 		case UNLOCKED:
 			if(PINA == 0x02){
 				state = HOLD;
+			}
+			else if(PINA == 0x06){
+				state = LOCKED;
 			}else if(PINA == 0x00){
 				state = UNLOCKED;
 				//no button is pressed
@@ -50,9 +53,9 @@ void TickFct()
 			}
 			break;
 		case HOLD:
-			if(PINA == 0x02){
+			if((PINA & 0x07) == 0x02){
 				state = HOLD;
-			}else if((PINA & 0x80) == 0x80){
+			}else if(((PINA & 0x80) == 0x80)|| (PINA == 0x06)){
 				state = LOCKED;
 			}else{
 				state = INIT;
