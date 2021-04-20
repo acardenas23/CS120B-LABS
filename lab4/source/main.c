@@ -40,6 +40,8 @@ void TickFct()
 				state = HOLDINC;
 			}else if(PINA == 0x03){
 				state = RESET;
+			}else if(PINA == 0x02){
+				state = DEC;
 			}else{
 				state = WAIT2;
 			}
@@ -49,6 +51,8 @@ void TickFct()
 				state = HOLDDEC;
 			}else if(PINA == 0x03){
 				state = RESET;
+			}else if(PINA == 0x01){
+				state = INC;
 			}else{
 				state = WAIT2;
 			}

@@ -39,6 +39,10 @@ tests = [
     },
 {'description': 'count up to 2, down to 1 => PORTC: 0x01',
     'steps': [ {'inputs': [('PINA',0x00)], 'iterations': 2},
+        {'inputs': [('PINA', 0x01)], 'iterations': 5},
+        {'inputs': [('PINA', 0x00)], 'iterations': 5},
+        {'inputs': [('PINA', 0x01)], 'iterations': 5},
+        {'inputs': [('PINA', 0x02)], 'iterations': 5},
         {'inputs': [('PINA', 0x03)], 'iterations': 5},
         {'inputs': [('PINA', 0x00)], 'iterations': 5},
         {'inputs': [('PINA', 0x02)], 'iterations': 5},
@@ -46,11 +50,11 @@ tests = [
         {'inputs': [('PINA', 0x01)], 'iterations': 5},
         {'inputs': [('PINA', 0x00)], 'iterations': 5},
         {'inputs': [('PINA', 0x01)], 'iterations': 5},
-        {'inputs': [('PINA', 0x00)], 'iterations': 5},
-        {'inputs': [('PINA', 0x02)], 'iterations': 5}
+        {'inputs': [('PINA', 0x02)], 'iterations': 5},
+        {'inputs': [('PINA', 0x01)], 'iterations': 5}
 
         ],
-    'expected': [('PORTC',0x01)],
+    'expected': [('PORTC',0x02)],
     },
 
 
