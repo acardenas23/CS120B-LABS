@@ -12,7 +12,7 @@
 #include "simAVRHeader.h"
 #endif
 
-enum states {START, INIT, UNLOCKEDPOUND, UNLOCKED, HOLD, LOCKED} state;
+enum states {START, INIT, UNLOCKEDPOUND, HOLDPOUND, UNLOCKED, HOLDY, LOCKED} state;
 
 
 void TickFct()
@@ -33,18 +33,24 @@ void TickFct()
 		case UNLOCKEDPOUND:
 			if(PINA == 0x04){
 				state = UNLOCKEDPOUND;
-			}else if(((PINA & 0x80) == 0x80)||((PINA & 0x06) == 0x06)){
-				state = LOCKED;
+			}else if(PINA == 0x00){
+				state = HOLDPOUND;
 			}else{
+				state = LOCKED;
+			}
+			break;
+		case HOLDPOUND:
+			if(PINA == 0x00){
+				state = HOLDPOUND;
+			}else if(PINA == 0x02){
 				state = UNLOCKED;
+			}else{
+				state = LOCKED;
 			}
 			break;
 		case UNLOCKED:
 			if(PINA == 0x02){
-				state = HOLD;
-			}
-			else if(PINA == 0x06){
-				state = LOCKED;
+				state = HOLDY;
 			}else if(PINA == 0x00){
 				state = UNLOCKED;
 				//no button is pressed
@@ -52,9 +58,9 @@ void TickFct()
 				state = INIT;
 			}
 			break;
-		case HOLD:
+		case HOLDY:
 			if((PINA & 0x07) == 0x02){
-				state = HOLD;
+				state = HOLDY;
 			}else if(((PINA & 0x80) == 0x80)|| (PINA == 0x06)){
 				state = LOCKED;
 			}else{
@@ -80,9 +86,11 @@ void TickFct()
 			break;
 		case UNLOCKEDPOUND:
 			break;
+		case HOLDPOUND:
+			break;
 		case UNLOCKED:
 			break;
-		case HOLD:
+		case HOLDY:
 			PORTB = 0x01;
 			break;
 		case LOCKED:
