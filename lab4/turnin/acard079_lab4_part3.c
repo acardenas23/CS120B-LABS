@@ -62,7 +62,7 @@ void TickFct()
 			}
 			break;
 		case LOCKED:
-			if(PINA == 0x80){
+			if((PINA == 0x80)||(PINA == 0x06)){
 				state = LOCKED;
 			}else{
 				state = INIT;
